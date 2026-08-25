@@ -61,25 +61,63 @@ def mobile_device_detected_page():
 
 @app.route('/submit', methods=['GET', 'POST'])
 def submit():
+    print("========== /submit called ==========")
+    print("Request method:", request.method)
+
     if request.method == 'POST':
-        image = request.files['image']
+        print("Files received:", request.files)
+
+        image = request.files.get('image')
+
+        if image is None:
+            print("ERROR: No image received")
+            return "No image uploaded", 400
+
+        print("Image received:", image.filename)
+
         filename = secure_filename(image.filename)
+
         if not filename:
+            print("ERROR: Invalid filename")
             return redirect(url_for('home_page'))
+
         file_path = os.path.join('static/uploads', filename)
         image.save(file_path)
-        print(file_path)
+
+        print("Image saved:", file_path)
+        print("Starting prediction...")
+
         pred = prediction(file_path)
+
+        print("Prediction completed:", pred)
+
         title = disease_info['disease_name'][pred]
-        description =disease_info['description'][pred]
+        description = disease_info['description'][pred]
         prevent = disease_info['Possible Steps'][pred]
         image_url = disease_info['image_url'][pred]
+
         supplement_name = supplement_info['supplement name'][pred]
         supplement_image_url = supplement_info['supplement image'][pred]
         supplement_buy_link = supplement_info['buy link'][pred]
-        return render_template('submit.html' , title = title , desc = description , prevent = prevent ,
-                               image_url = image_url, uploaded_image_url = url_for('static', filename='uploads/' + filename),
-                               pred = pred ,sname = supplement_name , simage = supplement_image_url , buy_link = supplement_buy_link)
 
+        print("Rendering result page...")
+
+        return render_template(
+            'submit.html',
+            title=title,
+            desc=description,
+            prevent=prevent,
+            image_url=image_url,
+            uploaded_image_url=url_for(
+                'static',
+                filename='uploads/' + filename
+            ),
+            pred=pred,
+            sname=supplement_name,
+            simage=supplement_image_url,
+            buy_link=supplement_buy_link
+        )
+
+    return redirect(url_for('home_page'))
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
