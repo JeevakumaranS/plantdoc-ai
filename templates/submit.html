@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block pagetitle %}PlantDoc — {{ title }}{% endblock %}
+{% block body %}
+<section class="chat">
+  <div class="message"><div class="avatar">♧</div><div class="bubble"><p>Scan complete.</p></div></div>
+  <div class="result-grid">
+    <img class="result-image" src="{{ uploaded_image_url }}" alt="Uploaded plant image" style="object-fit:contain;background:#fff">
+    <div>
+      <h1 class="result-title">{{ title }}</h1>
+      <article class="result-panel"><h3>Details</h3><p>{{ desc }}</p></article>
+      <article class="result-panel"><h3>Next steps</h3><p>{{ prevent }}</p></article>
+      {% if pred != 4 %}<article class="result-panel"><h3>{{ sname }}</h3><a class="button" target="_blank" rel="noopener" href="{{ buy_link }}">View product →</a></article>{% endif %}
+    </div>
+  </div>
+  <div class="message" style="margin-top:27px"><div class="avatar">♧</div><div class="bubble"><a href="/" style="color:#2d7a50;font-weight:700">New scan →</a></div></div>
+</section>
+{% endblock %}
