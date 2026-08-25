@@ -58,38 +58,33 @@ def ai_engine_page():
 @app.route('/mobile-device')
 def mobile_device_detected_page():
     return render_template('mobile-device.html')
-
 @app.route('/submit', methods=['GET', 'POST'])
 def submit():
-    print("========== /submit called ==========")
-    print("Request method:", request.method)
+    print("========== SUBMIT START ==========")
 
     if request.method == 'POST':
-        print("Files received:", request.files)
+        print("POST request received")
 
         image = request.files.get('image')
+        print("Image received:", image.filename if image else "NONE")
 
         if image is None:
-            print("ERROR: No image received")
             return "No image uploaded", 400
-
-        print("Image received:", image.filename)
 
         filename = secure_filename(image.filename)
 
         if not filename:
-            print("ERROR: Invalid filename")
             return redirect(url_for('home_page'))
 
         file_path = os.path.join('static/uploads', filename)
         image.save(file_path)
 
         print("Image saved:", file_path)
-        print("Starting prediction...")
+        print("STARTING MODEL PREDICTION")
 
         pred = prediction(file_path)
 
-        print("Prediction completed:", pred)
+        print("MODEL PREDICTION FINISHED:", pred)
 
         title = disease_info['disease_name'][pred]
         description = disease_info['description'][pred]
@@ -100,7 +95,7 @@ def submit():
         supplement_image_url = supplement_info['supplement image'][pred]
         supplement_buy_link = supplement_info['buy link'][pred]
 
-        print("Rendering result page...")
+        print("RENDERING RESULT")
 
         return render_template(
             'submit.html',
@@ -119,5 +114,7 @@ def submit():
         )
 
     return redirect(url_for('home_page'))
+
+    
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
